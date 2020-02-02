@@ -1,0 +1,33 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "lean-imports"
+  ],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "airbnb-base"
+  ],
+  "rules": {
+    "@typescript-eslint/explicit-function-return-type": 2,
+    "@typescript-eslint/camelcase": 0,
+    "@typescript-eslint/interface-name-prefix": 1,
+    "import/prefer-default-export": 0,
+    "camelcase": 0,
+    "import/extensions": 1,
+    "import/no-unresolved": 1,
+    "no-plusplus": 0,
+    "no-bitwise": 0,
+    "no-param-reassign": 1,
+    "no-shadow": 1,
+    "max-len": 1
+  }
+}
