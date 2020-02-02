@@ -50,7 +50,7 @@ describe("XMLXTreeDiff", () => {
 
   test('diff', () => {
     const xmlDiff = new XMLXTreeDiff(xmlStr, xmlStr2);
-    const { oldTree, newTree } = xmlDiff.diff<string>();
+    const { oldTree, newTree } = xmlDiff.diff();
     expect(oldTree).toBe(`<Meta op="${EditOption.NOP}"><Author op="${EditOption.NOP}">yidafu(dov yih)</Author><Title op="${EditOption.DEL}">x-tree-diff</Title></Meta>`)
     expect(newTree).toBe(`<Meta op="${EditOption.NOP}"><Author op="${EditOption.NOP}">yidafu(dov yih)</Author><Name op="${EditOption.INS}">x-tree-diff</Name></Meta>`)
   });

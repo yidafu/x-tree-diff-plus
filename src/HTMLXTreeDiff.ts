@@ -17,7 +17,7 @@ import XTree, { NodeType } from './XTree';
 const DOM_ELEMENT_TYPE = 1;
 const DOM_TEXT_TYPE = 3;
 
-export default class HMLTXTreeDiff extends XTreeDiff<HTMLElement> {
+export default class HMLTXTreeDiff extends XTreeDiff<HTMLElement, HTMLElement> {
   // eslint-disable-next-line class-methods-use-this
   public buildXTree(domNode: HTMLElement): XTree {
     if (!(domNode instanceof HTMLElement)) {

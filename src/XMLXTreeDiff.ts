@@ -22,9 +22,9 @@ interface XMLNode {
 export const ROOT_LABEL = 'root';
 // type XMLNode = Record<string, XMLNode | string[]>
 const { parseString } = xml2js;
-export default class XMLXTreeDiff extends XTreeDiff<string> {
+export default class XMLXTreeDiff extends XTreeDiff<string, XMLNode> {
   // eslint-disable-next-line class-methods-use-this
-  public buildXTree(xmlStr: string): XTree {
+  public buildXTree(xmlStr: string): XTree<XMLNode> {
     let xmlObj: XMLNode | null = null;
     parseString(xmlStr, {
       async: false,
@@ -36,9 +36,9 @@ export default class XMLXTreeDiff extends XTreeDiff<string> {
       }
     });
 
-    function plainObj2XTree(obj: XMLNode, index: number): XTree | XTree[] {
+    function plainObj2XTree(obj: XMLNode, index: number): XTree<XMLNode> | XTree<XMLNode>[] {
       if (typeOf(obj) === 'Object') {
-        const result: XTree[] = [];
+        const result: XTree<XMLNode>[] = [];
         Object
           .keys(obj)
           .forEach((label, keyIdx) => {
@@ -68,7 +68,7 @@ export default class XMLXTreeDiff extends XTreeDiff<string> {
       // actually won't came here
       throw TypeError('XMLNode Must Be Object or string[]');
     }
-    const root = new XTree({ label: ROOT_LABEL, index: 1, type: NodeType.ELEMENT });
+    const root = new XTree<XMLNode>({ label: ROOT_LABEL, index: 1, type: NodeType.ELEMENT });
     const subtree = plainObj2XTree((xmlObj as unknown) as XMLNode, 1);
     root.append(subtree);
     return root;
@@ -76,8 +76,8 @@ export default class XMLXTreeDiff extends XTreeDiff<string> {
 
   // FIXME: remove return any
   // eslint-disable-next-line class-methods-use-this
-  public dumpXTree(xTree: XTree): any {
-    function traverse(node: XTree): string {
+  public dumpXTree(xTree: XTree<XMLNode>): string {
+    function traverse(node: XTree<XMLNode>): string {
       if (node.type === NodeType.ELEMENT) {
         let treeStr = '';
         if (node.label !== ROOT_LABEL) {

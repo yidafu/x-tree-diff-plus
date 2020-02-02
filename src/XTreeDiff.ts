@@ -17,14 +17,14 @@ import {
 } from './utils';
 import EditOption from './EditOption';
 
-export default abstract class XTreeDiff<T> {
+export default abstract class XTreeDiff<T = any, S= any> {
   /** @types {Map<string, XTree>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
-  private N_Htable = new Map < string, XTree >();
+  private N_Htable = new Map < string, XTree<S> >();
 
   /** @types {Map<string, XTree>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
-  private O_Htable = new Map < string, XTree[] >();
+  private O_Htable = new Map < string, XTree<S>[] >();
 
-  private M_List = new Map < XTree, XTree >();
+  private M_List = new Map < XTree<S>, XTree<S> >();
 
   protected rawOld: T;
   protected rawMew: T;
@@ -34,19 +34,19 @@ export default abstract class XTreeDiff<T> {
     this.rawMew = T_new;
   }
 
-  private matchNodes(node1: XTree, node2: XTree, op: EditOption): void {
+  private matchNodes(node1: XTree<S>, node2: XTree<S>, op: EditOption): void {
     node1.Op = op;
     node2.Op = op;
     node1.nPtr = node2;
     node2.nPtr = node1;
   }
 
-  private matchNodeSubtreeWith(node1: XTree, node2: XTree, op: EditOption): void {
+  private matchNodeSubtreeWith(node1: XTree<S>, node2: XTree<S>, op: EditOption): void {
     const stack1 = [node1];
     const stack2 = [node2];
     while (stack1.length && stack2.length) {
-      const nodeA = stack1.pop() as XTree;
-      const nodeB = stack2.pop() as XTree;
+      const nodeA = stack1.pop() as XTree<S>;
+      const nodeB = stack2.pop() as XTree<S>;
       this.matchNodes(nodeA, nodeB, op);
       if (nodeA.hasChildren()) {
         nodeA.forEach(node => stack1.push(node));
@@ -58,7 +58,7 @@ export default abstract class XTreeDiff<T> {
   }
 
   private initHtable(
-    root: XTree, callback: (node: XTree, tMD_map: Map < string, number >) => void,
+    root: XTree<S>, callback: (node: XTree<S>, tMD_map: Map < string, number >) => void,
   ): Map < string, number > {
     const tMD_map = new Map < string,
       number >();
@@ -74,7 +74,7 @@ export default abstract class XTreeDiff<T> {
     return tMD_map;
   }
 
-  diff<Y>(): { oldTree: Y; newTree: Y } {
+  diff(): { oldTree: S; newTree: S } {
     const { rawOld, rawMew } = this;
     const T_old = this.buildXTree(rawOld);
     const T_new = this.buildXTree(rawMew);
@@ -200,7 +200,9 @@ export default abstract class XTreeDiff<T> {
     };
   }
 
-  public abstract buildXTree(rawTree: any): XTree;
+  public abstract buildXTree(rawTree: T): XTree<S>;
 
-  public abstract dumpXTree(xTree: XTree): any;
+  public dumpXTree(xTree: XTree<S>): any {
+    return xTree;
+  }
 }

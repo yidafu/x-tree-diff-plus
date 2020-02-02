@@ -32,7 +32,7 @@ describe('xTreeDiff', () => {
     const T_old = createTree1();
     const T_new = createTree2();
     const xTreeDiff = new DefaultXTreeDiff(T_old, T_new);
-    xTreeDiff.diff<XTree>();
+    xTreeDiff.diff();
     expect(T_old.nPtr).toBe(T_new);
       expect(T_old.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.DEL);
       expect(T_new.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.INS);
@@ -43,7 +43,7 @@ describe('xTreeDiff', () => {
     const T_old = createTree1();
     const T_new = createTree3();
     const xTreeDiff = new DefaultXTreeDiff(T_old, T_new);
-    xTreeDiff.diff<XTree>();
+    xTreeDiff.diff();
     expect(T_old.nPtr).toBe(T_new);
     expect(T_old.getChild(0)?.getChild(1)?.Op).toBe(EditOption.MOV);
     expect(T_new.getChild(1)?.getChild(0)?.Op).toBe(EditOption.MOV);
