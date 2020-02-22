@@ -9,7 +9,7 @@
  *                                                                           *
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-import { typeOf } from "./utils";
+import { typeOf, Memo } from "./utils";
 
 describe('utils typeOf', () => {
   test('typeOf({})', () => {
@@ -36,3 +36,21 @@ describe('utils typeOf', () => {
     expect(typeOf(undefined)).toBe('Undefined');
   });
 });
+
+describe('Memo Decrator', () => {
+  test('getter', () => {
+
+    class Apple {
+      i = 0;
+      @Memo
+      get prop() {
+        console.log(this)
+        return ++this.i;
+      }
+    }
+    const a = new Apple();
+    expect(a.prop).toBe(1);
+    expect(a.prop).toBe(1);
+    expect(a.prop).toBe(1);
+  });
+})

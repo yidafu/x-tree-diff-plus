@@ -23,7 +23,7 @@ export type visitorFn = (node: XTree) => boolean | void;
  * @param {XTree} root
  * @param {(node: XTree) => boolean} visitor
  */
-export function XTreeDFTraverse(root: XTree, visitor: visitorFn): void {
+export function XTreeDFTraverse<T>(root: XTree<T>, visitor: visitorFn): void {
   if (!root) return;
   const stack = [root];
   while (stack.length) {
@@ -45,7 +45,7 @@ export function XTreeDFTraverse(root: XTree, visitor: visitorFn): void {
  * @param {(node: XTree) => boolean} visitor
  * @returns {void}
  */
-export function XTreeBFTraverse(root: XTree, visitor: visitorFn): void {
+export function XTreeBFTraverse<T>(root: XTree<T>, visitor: visitorFn): void {
   if (!root) return;
   const queue = [root];
   while (queue.length) {
@@ -54,5 +54,27 @@ export function XTreeBFTraverse(root: XTree, visitor: visitorFn): void {
     if (!stop && node.hasChildren()) {
       node.forEach(child => queue.push(child));
     }
+  }
+}
+
+export function XTreeDFPostOrderTraverse<T>(node: XTree<T>, visitor: visitorFn): void {
+  node.forEach(child => visitor(child));
+  visitor(node);
+}
+
+
+export function Memo(target: any, propertyKey: string, descriptor: PropertyDescriptor): void {
+  if (typeof descriptor.get === 'function') {
+    const sym = Symbol.for(propertyKey);
+    const originalGetter = descriptor.get;
+    descriptor.get = function propGetter(): ReturnType<typeof originalGetter> {
+      // @ts-ignore
+      if (typeOf(this[sym]) === 'Undefined') {
+        // @ts-ignore
+        this[sym] = originalGetter.call(this);
+      }
+      // @ts-ignore
+      return this[sym];
+    };
   }
 }
