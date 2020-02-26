@@ -15,6 +15,7 @@ enum EditOption {
   DEL,
   UPD,
   MOV,
+  CPY,
 }
 
 export default EditOption;

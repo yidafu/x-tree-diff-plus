@@ -11,13 +11,13 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 
-import XTreeDiff from './XTreeDiff';
+import XTreeDiffPlus from './XTreeDiffPlus';
 import XTree, { NodeType } from './XTree';
 
 const DOM_ELEMENT_TYPE = 1;
 const DOM_TEXT_TYPE = 3;
 
-export default class HMLTXTreeDiff extends XTreeDiff<HTMLElement, HTMLElement> {
+export default class HMLTXTreeDiff extends XTreeDiffPlus<HTMLElement, HTMLElement> {
   // eslint-disable-next-line class-methods-use-this
   public buildXTree(domNode: HTMLElement): XTree {
     if (!(domNode instanceof HTMLElement)) {

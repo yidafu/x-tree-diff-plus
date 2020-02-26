@@ -268,6 +268,14 @@
   dependencies:
     find-up "^4.0.0"
 
+"@dovyih/x-tree-diff@0.0.2-alpha.21":
+  version "0.0.2-alpha.21"
+  resolved "https://registry.npmjs.org/@dovyih/x-tree-diff/-/x-tree-diff-0.0.2-alpha.21.tgz#60a09b061c41a1715a0322f7246946279e07cd64"
+  integrity sha512-3rmOq786S/+npQ8KiR3uqL8XPKHEr0b6MaVpNynUH0yXQw6UBpNLX10/MA0Z8lRY2gGj3/TQNVN2vNX3Ckb5jg==
+  dependencies:
+    md5 "^2.2.1"
+    xml2js "^0.4.23"
+
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
   resolved "https://registry.npm.taobao.org/@jest/console/download/@jest/console-24.9.0.tgz#79b1bc06fb74a8cfb01cbdedf945584b1b9707f0"

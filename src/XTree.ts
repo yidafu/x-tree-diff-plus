@@ -13,10 +13,7 @@
 
 import EditOption from './EditOption';
 import md4 from './md4';
-import { typeOf } from './utils';
-
-const tMDSym = Symbol('tMD');
-const nMDSym = Symbol('nMD');
+import { typeOf, Memo } from './utils';
 
 export enum NodeType {
   ELEMENT = 'ELEMENT',
@@ -31,6 +28,7 @@ interface IBaseParam<T> {
 }
 
 interface INodeParam<T> extends IBaseParam<T> {
+  id?: string;
   label: string;
   type: NodeType.ELEMENT;
 }
@@ -44,6 +42,9 @@ interface ITextParam<T> extends IBaseParam<T> {
 export type IXTreeConstructorParam<T = any> = INodeParam<T> | ITextParam<T>;
 
 export default class XTree<T = any> {
+  /** @type {string} */
+  id?: string;
+
   /**
    * node tag name
    *
@@ -66,7 +67,7 @@ export default class XTree<T = any> {
    * @type {string}
    * @memberof XTree
    */
-  public value = '';
+  public value: string | null = null;
 
   /**
    * child index
@@ -76,7 +77,6 @@ export default class XTree<T = any> {
    */
   public index: number;
 
-  private [nMDSym]: string;
   /**
    * node message digest
    *
@@ -84,14 +84,11 @@ export default class XTree<T = any> {
    * @type {string}
    * @memberof XTree
    */
+  @Memo
   public get nMD(): string {
-    if (!this[nMDSym]) {
-      this[nMDSym] = md4(this.label + this.value);
-    }
-    return this[nMDSym];
+    return md4(this.label + this.value ?? '');
   }
 
-  private [tMDSym]: string;
   /**
    * tree message digest
    *
@@ -99,15 +96,25 @@ export default class XTree<T = any> {
    * @type {string}
    * @memberof XTree
    */
+  @Memo
   public get tMD(): string {
-    if (!this[tMDSym]) {
-      let tMD = this.nMD;
-      this.children.forEach((child) => {
-        tMD += child.tMD;
-      });
-      this[tMDSym] = md4(tMD);
-    }
-    return this[tMDSym];
+    let tMD = this.nMD;
+    this.children.forEach((child) => {
+      tMD += child.tMD;
+    });
+    return md4(tMD);
+  }
+
+  /**
+   * uniquely identify each node
+   *
+   * @readonly
+   * @type {string}
+   * @memberof XTree
+   */
+  @Memo
+  public get iMD(): string | undefined {
+    return md4(this.label + this.id);
   }
 
   /**
@@ -153,6 +160,84 @@ export default class XTree<T = any> {
   }
 
   /**
+   *
+   *
+   * @readonly
+   * @type {number}
+   * @memberof XTree
+   */
+  @Memo
+  public get positiveMatch(): number {
+    let positiveMatch = 0;
+    this.forEach((node) => {
+      if (this.nPtr && this.nPtr === node.nPtr?.pPtr) {
+        positiveMatch++;
+      }
+    });
+    return positiveMatch;
+  }
+
+  /**
+   *
+   *
+   * @readonly
+   * @type {number}
+   * @memberof XTree
+   */
+  @Memo
+  public get negativeMatch(): number {
+    let negativeMatch = 0;
+    this.forEach((node) => {
+      if (this.nPtr && this.nPtr !== node?.nPtr?.pPtr) {
+        negativeMatch++;
+      }
+    });
+    return negativeMatch;
+  }
+  /**
+   *
+   *
+   * @readonly
+   * @type {number}
+   * @memberof XTree
+   */
+ @Memo
+  public get consistency(): number {
+    const positiveMatch = this.positiveMatch;
+    const negativeMatch = this.negativeMatch;
+    // FIXMEL negativeMatch may == 0
+    return positiveMatch / (positiveMatch + negativeMatch);
+  }
+
+ public alernativeMetches(): {supportingDegree: number; supportingDegreeNode: XTree | null } {
+   /** @type {XTree[]} the list of alernative metches */
+   const lAM: Map<XTree, number> = new Map();
+   this.forEach((node) => {
+     // am ==> alernativeMetch
+     const am = node?.nPtr?.pPtr;
+     if (am && am !== this.nPtr && am.label !== this.label) {
+       if (lAM.has(am)) {
+         lAM.set(am, (lAM.get(am) || 0) + 1);
+       } else {
+         lAM.set(am, 1);
+       }
+     }
+   });
+   let supportingDegree = 0;
+   let supportingDegreeNode = null;
+   // eslint-disable-next-line no-restricted-syntax
+   for (const [node, value] of lAM) {
+     if (supportingDegree < value) {
+       supportingDegreeNode = node;
+       supportingDegree = value;
+     }
+   }
+   return {
+     supportingDegree,
+     supportingDegreeNode,
+   };
+ }
+  /**
    * children list container
    *
    * @private
@@ -183,6 +268,7 @@ export default class XTree<T = any> {
     this.type = param.type;
     this.data = param.data;
     if (param.type === NodeType.ELEMENT) {
+      this.id = param.id;
       this.label = param.label;
     } else {
       this.label = NodeType.TEXT;

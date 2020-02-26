@@ -11,7 +11,7 @@
  *-------------------------------------------------------------------------- */
 
 import xml2js from 'xml2js';
-import XTreeDiff from './XTreeDiff';
+import XTreeDiffPlus from './XTreeDiffPlus';
 import XTree, { NodeType } from './XTree';
 import { typeOf } from './utils';
 
@@ -22,7 +22,7 @@ interface XMLNode {
 export const ROOT_LABEL = 'root';
 // type XMLNode = Record<string, XMLNode | string[]>
 const { parseString } = xml2js;
-export default class XMLXTreeDiff extends XTreeDiff<string, XMLNode> {
+export default class XMLXTreeDiff extends XTreeDiffPlus<string, XMLNode> {
   // eslint-disable-next-line class-methods-use-this
   public buildXTree(xmlStr: string): XTree<XMLNode> {
     let xmlObj: XMLNode | null = null;
