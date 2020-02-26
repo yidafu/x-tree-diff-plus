@@ -10,14 +10,14 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 
-import XTreeDiff from './XTreeDiff';
+import XTreeDiffPlus from './XTreeDiffPlus';
 import EditOption from './EditOption';
 import createTree1 from '../test/tree1';
 import createTree2 from '../test/tree2';
 import createTree3 from '../test/tree3';
 import XTree from './XTree';
 
-class DefaultXTreeDiff extends XTreeDiff<XTree> {
+class DefaultXTreeDiff extends XTreeDiffPlus<XTree> {
   public buildXTree(tree: XTree) {
     return tree;
   }
@@ -33,6 +33,7 @@ describe('xTreeDiff', () => {
     const T_new = createTree2();
     const xTreeDiff = new DefaultXTreeDiff(T_old, T_new);
     xTreeDiff.diff();
+    console.log(T_old)
     expect(T_old.nPtr).toBe(T_new);
       expect(T_old.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.DEL);
       expect(T_new.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.INS);
