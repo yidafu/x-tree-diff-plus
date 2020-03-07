@@ -10,5 +10,3 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 export { default as XTreeDiff } from './XTreeDiffPlus';
-export { default as XMLXTreeDiff } from './XMLXTreeDiff';
-export { default as HTMLXTreeDiff } from './HTMLXTreeDiff';
