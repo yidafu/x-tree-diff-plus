@@ -31,6 +31,7 @@ interface INodeParam<T> extends IBaseParam<T> {
   id?: string;
   label: string;
   type: NodeType.ELEMENT;
+  children?: XTree<T>[];
 }
 
 interface ITextParam<T> extends IBaseParam<T> {
@@ -114,7 +115,10 @@ export default class XTree<T = any> {
    */
   @Memo
   public get iMD(): string | undefined {
-    return md4(this.label + this.id);
+    if (typeof this.id !== 'undefined') {
+      return md4(this.label + this.id);
+    }
+    return undefined;
   }
 
   /**
@@ -205,6 +209,9 @@ export default class XTree<T = any> {
   public get consistency(): number {
     const positiveMatch = this.positiveMatch;
     const negativeMatch = this.negativeMatch;
+    if (positiveMatch + negativeMatch === 0) {
+      return Infinity;
+    }
     // FIXMEL negativeMatch may == 0
     return positiveMatch / (positiveMatch + negativeMatch);
   }
@@ -270,6 +277,9 @@ export default class XTree<T = any> {
     if (param.type === NodeType.ELEMENT) {
       this.id = param.id;
       this.label = param.label;
+      if (Array.isArray(param.children)) {
+        this.append(param.children);
+      }
     } else {
       this.label = NodeType.TEXT;
       this.value = param.value;
@@ -282,7 +292,7 @@ export default class XTree<T = any> {
         child.pPtr = this;
         this.children.push(child);
       } else {
-        throw TypeError(`child must be XTree, not ${typeOf(child)}`);
+        throw TypeError(`Child must be XTree<T>, not ${typeOf(child)}`);
       }
     };
     if (Array.isArray(children)) {

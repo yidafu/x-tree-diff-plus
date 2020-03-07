@@ -10,10 +10,11 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 /* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import {
   XTreeDFTraverse,
   XTreeBFTraverse,
-  typeOf,
+  // typeOf,
   XTreeDFPostOrderTraverse,
 } from './utils';
 import XTree from './XTree';
@@ -23,10 +24,11 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
   /** @types {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
   private N_Htable = new Map <string, XTree<S>>();
 
-  /** @types {Map<string, XTree<S>>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
-  private O_Htable = new Map <string, XTree<S>[] >();
+  /** @types {Map<string, XTree<S>[]>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
+  private O_Htable = new Map <string, XTree<S>[]>();
 
-  private M_List = new Map <XTree<S>, XTree<S>>();
+  /** @types {Map<XTree<S>, XTree<S>>} [oldTreeNode, newTreeNode] */
+  private M_List = new Map<XTree<S>, XTree<S>>();
 
   /** @type {Map<string, XTree<S>>} iMd as key, X-tree Node as value  */
   private N_IDHtable = new Map<string, XTree<S>>();
@@ -66,7 +68,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
    *
    * @private
    * @param {XTree<S>} root
-   * @param {(node: XTree<S>, tMD_map: Map < string, number >) => void} callback tMD_map: tMD 出现的次数
+   * @param {(node: XTree<S>, tMD_map: Map <string, number>) => void} callback tMD_map: tMD 出现的次数
    * @returns {Map < string, number >}
    * @memberof XTreeDiffPlus
    */
@@ -115,21 +117,34 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
       }
     });
 
-    // XTreeDFTraverse(T_new);
-
-    XTreeBFTraverse<S>(T_old, (N_node: XTree<S>): boolean => {
+    XTreeBFTraverse<S>(T_old, (oNode: XTree<S>): boolean => {
       // any entry of O_Htable does NOT hava the same tMD value that the node N has
-      if (!this.O_Htable.has(N_node.tMD)) {
+      if (!this.O_Htable.has(oNode.tMD)) { // N_node is is unique
         // any entry of N_Htable has the same tMD value that the node N has
-        if (this.N_Htable.has(N_node.tMD)) {
-          const M_node = this.N_Htable.get(N_node.tMD) as XTree<S>;
+        if (this.N_Htable.has(oNode.tMD)) {
+          const M_node = this.N_Htable.get(oNode.tMD) as XTree<S>;
           // subtree node will set Op in step 3
-          this.matchNodesWith(N_node, M_node, EditOption.NOP);
-          this.M_List.set(N_node, M_node);
+          this.matchNodesWith(oNode, M_node, EditOption.NOP);
+          this.M_List.set(oNode, M_node);
           return true;
         }
       }
       return false;
+    });
+
+    // matches node with the same iMD
+    XTreeBFTraverse<S>(T_old, (oNode: XTree<S>) => {
+      // unmatch node after preivuos sub-step
+      if (!this.M_List.has(oNode)) {
+        if (typeof oNode.iMD !== 'undefined') {
+          if (this.N_IDHtable.has(oNode.iMD)) {
+            const nNode = this.N_IDHtable.get(oNode.iMD)!;
+            nNode.Op = EditOption.NOP;
+            nNode.nPtr = oNode;
+            oNode.nPtr = nNode;
+          }
+        }
+      }
     });
 
     // step 2 propagete matching upward
@@ -157,7 +172,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
 
     // step 3 match remaining nodes downwards
     XTreeDFTraverse<S>(T_old, (nodeA: XTree<S>) => {
-      if (nodeA.nPtr !== null) { // nodeA has been matched
+      if (nodeA.Op !== null) { // nodeA has been matched
         /** @type {XTree<S>[]} unmathed children of nodeA */
         const cA: XTree<S>[] = [];
         // find all unmatched child
@@ -209,7 +224,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     // step 5 metch remaining identical subtree with move and copy operations
     const S_Htable: Map<string, XTree[]> = new Map();
     XTreeBFTraverse(T_old, (node: XTree) => {
-      if (typeof node.Op === 'undefined') {
+      if (node.Op === null) {
         if (S_Htable.has(node.tMD)) {
           const T_LNp = S_Htable.get(node.tMD);
           if (T_LNp) {
@@ -222,7 +237,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     });
     const T_Htable: Map<string, XTree[]> = new Map();
     XTreeBFTraverse(T_new, (node: XTree) => {
-      if (typeof node.Op === 'undefined') {
+      if (node.Op === null) {
         if (T_Htable.has(node.tMD)) {
           const T_LNp = T_Htable.get(node.tMD);
           if (T_LNp) {
@@ -237,29 +252,30 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     // eslint-disable-next-line no-restricted-syntax
     for (const [hKey, T_LNp] of T_Htable) {
       if (S_Htable.has(hKey)) {
-        const S_LNp = S_Htable.get!(hKey);
+        const S_LNp = S_Htable.get(hKey)!;
         const lnT = T_LNp.length;
         const lnS = S_LNp?.length ?? 0;
         if (lnS < lnT) {
           for (let idxS = 0; idxS < lnS - 1; idxS++) {
-            // @ts-ignore
             S_LNp[idxS].nPtr = T_LNp[idxS];
           }
           for (let idxT = lnS - 1; idxT < lnT; idxT++) {
             T_LNp[idxT].Op = EditOption.CPY;
-            // @ts-ignore
-            T_LNp[idxT].nPtr = S_LNp[lnS - 1];
+            T_LNp[idxT].nPtr = S_LNp[lnS - 1] ?? null;
           }
         }
         if (lnS > lnT) {
-          // @ts-ignore
           S_LNp[0].Op = EditOption.MOV;
-          // @ts-ignore
           S_LNp[0].nPtr = T_LNp[0];
           // for (let idxT = 0; idxT < lnT; idxT++) {
           // }
         }
       }
+      // else {
+      //   T_LNp.forEach((node) => {
+      //     node.Op = EditOption.INS;
+      //   });
+      // }
     }
     const oldTree = this.dumpXTree(T_old);
     const newTree = this.dumpXTree(T_new);
