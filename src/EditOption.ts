@@ -15,7 +15,7 @@ enum EditOption {
   DEL,
   UPD,
   MOV,
-  CPY,
+  CPY, // deprecate
 }
 
 export default EditOption;

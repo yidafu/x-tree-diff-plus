@@ -12,7 +12,7 @@
 
 import XTreeDiffPlus from './XTreeDiffPlus';
 import EditOption from './EditOption';
-import { createTree1, createTree2, createTree3} from '../test/three-nodes';
+import { createTree1, createTree2, createTree3, createTree5, createTree4} from '../test/three-nodes';
 // import createTree1 from '../test/tree1';
 // import createTree2 from '../test/tree2';
 // import createTree3 from '../test/tree3';
@@ -35,7 +35,16 @@ describe('three nodes', () => {
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
+  });
 
+  test('tree5 modify the second children node compared with tree4', () => {
+    const oldTree = createTree4();
+    const newTree = createTree5();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree?.getChild(0)?.Op).toBe(EditOption.NOP)
+    expect(oldTree?.getChild(1)?.Op).toBe(EditOption.UPD)
   });
 });
 

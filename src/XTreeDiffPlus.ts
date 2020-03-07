@@ -63,6 +63,38 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
       }
     }
   }
+
+  /**
+   * propagete matching upward
+   *
+   * @private
+   * @param {Map<XTree, XTree>} matchMap
+   * @memberof XTreeDiffPlus
+   */
+  private matchUpward(matchMap: Map<XTree, XTree> | [XTree, XTree][]): void {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [nodeA, nodeB] of matchMap) {
+      let pA: XTree = nodeA.pPtr as XTree<S>;
+      let pB: XTree = nodeB.pPtr as XTree<S>;
+      while (true) {
+        if (pA === null && pB === null) {
+          break;
+        }
+        if (pA.nPtr === null && pB.nPtr === null) {
+          if (pA.label === pB.label) {
+            this.matchNodesWith(pA, pB, EditOption.NOP);
+            pA = pA.pPtr as XTree<S>;
+            pB = pB.pPtr as XTree<S>;
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      }
+    }
+  }
+
   /**
    *
    *
@@ -148,27 +180,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     });
 
     // step 2 propagete matching upward
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [nodeA, nodeB] of this.M_List) {
-      let pA: XTree = nodeA.pPtr as XTree<S>;
-      let pB: XTree = nodeB.pPtr as XTree<S>;
-      while (true) {
-        if (pA === null && pB === null) {
-          break;
-        }
-        if (pA.nPtr === null && pB.nPtr === null) {
-          if (pA.label === pB.label) {
-            this.matchNodesWith(pA, pB, EditOption.NOP);
-            pA = pA.pPtr as XTree<S>;
-            pB = pB.pPtr as XTree<S>;
-          } else {
-            break;
-          }
-        } else {
-          break;
-        }
-      }
-    }
+    this.matchUpward(this.M_List);
 
     // step 3 match remaining nodes downwards
     XTreeDFTraverse<S>(T_old, (nodeA: XTree<S>) => {
@@ -222,14 +234,13 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
       }
     });
     // step 5 metch remaining identical subtree with move and copy operations
+    // find all unmatch nodes
     const S_Htable: Map<string, XTree[]> = new Map();
     XTreeBFTraverse(T_old, (node: XTree) => {
       if (node.Op === null) {
         if (S_Htable.has(node.tMD)) {
-          const T_LNp = S_Htable.get(node.tMD);
-          if (T_LNp) {
-            T_LNp.push(node);
-          }
+          const T_LNp = S_Htable.get(node.tMD)!;
+          T_LNp.push(node);
         } else {
           S_Htable.set(node.tMD, [node]);
         }
@@ -239,10 +250,8 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     XTreeBFTraverse(T_new, (node: XTree) => {
       if (node.Op === null) {
         if (T_Htable.has(node.tMD)) {
-          const T_LNp = T_Htable.get(node.tMD);
-          if (T_LNp) {
-            T_LNp.push(node);
-          }
+          const T_LNp = T_Htable.get(node.tMD)!;
+          T_LNp.push(node);
         } else {
           T_Htable.set(node.tMD, [node]);
         }
@@ -253,29 +262,42 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
     for (const [hKey, T_LNp] of T_Htable) {
       if (S_Htable.has(hKey)) {
         const S_LNp = S_Htable.get(hKey)!;
-        const lnT = T_LNp.length;
         const lnS = S_LNp?.length ?? 0;
-        if (lnS < lnT) {
-          for (let idxS = 0; idxS < lnS - 1; idxS++) {
-            S_LNp[idxS].nPtr = T_LNp[idxS];
-          }
-          for (let idxT = lnS - 1; idxT < lnT; idxT++) {
-            T_LNp[idxT].Op = EditOption.CPY;
-            T_LNp[idxT].nPtr = S_LNp[lnS - 1] ?? null;
+        const lnT = T_LNp.length;
+        const len = Math.min(lnS, lnT);
+        for (let idx = 0; idx < len; idx++) {
+          S_LNp[idx].nPtr = T_LNp[idx];
+          T_LNp[idx].nPtr = S_LNp[idx];
+          // FIXME: 这里 EditOption 需要修正
+          this.matchNodeSubtreeWith(S_LNp[idx], T_LNp[idx], EditOption.NOP);
+          this.matchUpward([[S_LNp[idx], T_LNp[idx]]]);
+        }
+
+        if (len < lnS) {
+          for (let idxS = len; idxS < lnS; idxS++) {
+            const pnNode = S_LNp[idxS]?.pPtr?.nPtr?.getChild(idxS);
+            if (pnNode) {
+              this.matchNodeSubtreeWith(pnNode, S_LNp[idxS], EditOption.UPD);
+            } else {
+              S_LNp[idxS].Op = EditOption.DEL;
+            }
           }
         }
-        if (lnS > lnT) {
-          S_LNp[0].Op = EditOption.MOV;
-          S_LNp[0].nPtr = T_LNp[0];
-          // for (let idxT = 0; idxT < lnT; idxT++) {
-          // }
+        if (len < lnT) {
+          for (let idxT = len; idxT < lnS; idxT++) {
+            const pnNode = T_LNp[idxT]?.pPtr?.nPtr?.getChild(idxT);
+            if (pnNode) {
+              this.matchNodeSubtreeWith(pnNode, T_LNp[idxT], EditOption.UPD);
+            } else {
+              T_LNp[idxT].Op = EditOption.INS;
+            }
+          }
         }
+      } else {
+        T_LNp.forEach((node) => {
+          node.Op = EditOption.INS;
+        });
       }
-      // else {
-      //   T_LNp.forEach((node) => {
-      //     node.Op = EditOption.INS;
-      //   });
-      // }
     }
     const oldTree = this.dumpXTree(T_old);
     const newTree = this.dumpXTree(T_new);
