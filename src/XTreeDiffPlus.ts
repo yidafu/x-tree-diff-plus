@@ -189,7 +189,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
         const cA: XTree<S>[] = [];
         // find all unmatched child
         nodeA.forEach((child) => {
-          if (child.nPtr === null) {
+          if (child.Op === null) {
             cA.push(child);
           }
         });
@@ -200,7 +200,7 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
         // find all unmatched child
         // eslint-disable-next-line no-unused-expressions
         nodeB?.forEach((child): void => {
-          if (child.nPtr === null) {
+          if (child.Op === null) {
             cB.push(child);
           }
         });
@@ -227,12 +227,12 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
         const { supportingDegree, supportingDegreeNode } = node.alernativeMetches();
         if (supportingDegreeNode
             && supportingDegree > node.positiveMatch + supportingDegreeNode.positiveMatch) {
-          node.Op = EditOption.NOP;
-          supportingDegreeNode.Op = EditOption.NOP;
-          node.nPtr = supportingDegreeNode;
+          this.matchNodesWith(node.nPtr!, supportingDegreeNode.nPtr!, EditOption.NOP);
+          this.matchNodesWith(node, supportingDegreeNode, EditOption.NOP);
         }
       }
     });
+
     // step 5 metch remaining identical subtree with move and copy operations
     // find all unmatch nodes
     const S_Htable: Map<string, XTree[]> = new Map();

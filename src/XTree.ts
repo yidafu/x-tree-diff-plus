@@ -174,7 +174,7 @@ export default class XTree<T = any> {
   public get positiveMatch(): number {
     let positiveMatch = 0;
     this.forEach((node) => {
-      if (this.nPtr && this.nPtr === node.nPtr?.pPtr) {
+      if (node?.pPtr?.nPtr === node.nPtr?.pPtr) {
         positiveMatch++;
       }
     });
@@ -192,7 +192,7 @@ export default class XTree<T = any> {
   public get negativeMatch(): number {
     let negativeMatch = 0;
     this.forEach((node) => {
-      if (this.nPtr && this.nPtr !== node?.nPtr?.pPtr) {
+      if (node?.pPtr?.nPtr !== node?.nPtr?.pPtr) {
         negativeMatch++;
       }
     });
