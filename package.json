@@ -29,8 +29,8 @@
     "lint": "eslint --ext .ts --fix src/",
     "test": "jest",
     "ts": "ts-node",
-    "prepublishOnly": "rm -fr dsit && yarn build",
-    "build": "tsc --build tsconfig.json"
+    "prepublishOnly": "yarn build",
+    "build": "rm -fr dsit && tsc --build tsconfig.json"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
