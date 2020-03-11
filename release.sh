@@ -2,8 +2,8 @@ echo "Enter release version: "
 
 read VERSION
 
-npm version $VERSION
+npm --git-tag-version version $VERSION # -m "release: v$VERSION"
 
-npm publish
+npm publish --access public
 
 git push origin v$VERSION
