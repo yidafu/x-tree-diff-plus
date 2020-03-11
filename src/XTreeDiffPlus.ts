@@ -154,10 +154,14 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
       if (!this.O_Htable.has(oNode.tMD)) { // N_node is is unique
         // any entry of N_Htable has the same tMD value that the node N has
         if (this.N_Htable.has(oNode.tMD)) {
-          const M_node = this.N_Htable.get(oNode.tMD) as XTree<S>;
+          const nNode = this.N_Htable.get(oNode.tMD) as XTree<S>;
           // subtree node will set Op in step 3
-          this.matchNodesWith(oNode, M_node, EditOption.NOP);
-          this.M_List.set(oNode, M_node);
+          if (nNode.index === oNode.index) {
+            this.matchNodesWith(oNode, nNode, EditOption.NOP);
+          } else {
+            this.matchNodesWith(oNode, nNode, EditOption.MOV);
+          }
+          this.M_List.set(oNode, nNode);
           return true;
         }
       }
@@ -171,9 +175,11 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
         if (typeof oNode.iMD !== 'undefined') {
           if (this.N_IDHtable.has(oNode.iMD)) {
             const nNode = this.N_IDHtable.get(oNode.iMD)!;
-            nNode.Op = EditOption.NOP;
-            nNode.nPtr = oNode;
-            oNode.nPtr = nNode;
+            if (oNode.index === nNode.index) {
+              this.matchNodesWith(nNode, oNode, EditOption.NOP);
+            } else {
+              this.matchNodesWith(nNode, oNode, EditOption.MOV);
+            }
           }
         }
       }
@@ -208,13 +214,13 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
         for (let bIdx = 0; bIdx < cB.length; bIdx++) {
           const aIdx = cA.findIndex(chidA => chidA.tMD === cB[bIdx].tMD);
           if (aIdx !== -1) {
+            // sub-tree is eaual, so mark sub-tree as NOP
             this.matchNodeSubtreeWith(cA[aIdx], cB[bIdx], EditOption.NOP);
           } else {
             const alLabelIdx = cA.findIndex(childA => childA.lLabel === cB[bIdx].lLabel);
             if (alLabelIdx !== -1) {
-              if (cA[alLabelIdx].value === cB[bIdx].value) {
-                this.matchNodesWith(cA[alLabelIdx], cB[bIdx], EditOption.NOP);
-              }
+              // The only certainty that node is equal
+              this.matchNodesWith(cA[alLabelIdx], cB[bIdx], EditOption.NOP);
             }
           }
         }
@@ -258,52 +264,84 @@ export default abstract class XTreeDiffPlus<T = any, S= any> {
       }
     });
 
+    // there are some situation:
+    //  1. duplicate sub-tree in two tree
+    //    1.1 the number of duplicate sub-tree is equal
+    //    1.2 the number of duplicate sub-tree isn't equal
+    //  2. has extra or missing sub-tree
+
+    // 5.1 match node with the same tMD
     // eslint-disable-next-line no-restricted-syntax
     for (const [hKey, T_LNp] of T_Htable) {
       if (S_Htable.has(hKey)) {
         const S_LNp = S_Htable.get(hKey)!;
         const lnS = S_LNp?.length ?? 0;
         const lnT = T_LNp.length;
+        // will match the rest sub-tree later
         const len = Math.min(lnS, lnT);
         for (let idx = 0; idx < len; idx++) {
           S_LNp[idx].nPtr = T_LNp[idx];
           T_LNp[idx].nPtr = S_LNp[idx];
-          // FIXME: 这里 EditOption 需要修正
           this.matchNodeSubtreeWith(S_LNp[idx], T_LNp[idx], EditOption.NOP);
           this.matchUpward([[S_LNp[idx], T_LNp[idx]]]);
+          S_LNp.splice(idx, 1);
+          T_LNp.splice(idx, 1);
         }
-
-        if (len < lnS) {
-          for (let idxS = len; idxS < lnS; idxS++) {
-            const pnNode = S_LNp[idxS]?.pPtr?.nPtr?.getChild(idxS);
-            if (pnNode) {
-              this.matchNodeSubtreeWith(pnNode, S_LNp[idxS], EditOption.UPD);
-            } else {
-              S_LNp[idxS].Op = EditOption.DEL;
-            }
-          }
-        }
-        if (len < lnT) {
-          for (let idxT = len; idxT < lnS; idxT++) {
-            const pnNode = T_LNp[idxT]?.pPtr?.nPtr?.getChild(idxT);
-            if (pnNode) {
-              this.matchNodeSubtreeWith(pnNode, T_LNp[idxT], EditOption.UPD);
-            } else {
-              T_LNp[idxT].Op = EditOption.INS;
-            }
-          }
-        }
-      } else {
-        T_LNp.forEach((node) => {
-          node.Op = EditOption.INS;
-        });
       }
     }
+
+    // find out all sub-tree has equivalent parent and the same index, marked as UPD
+    /** @types {Map<XTree | null, XTree[]>} key: parent nodes, value: unmatched children. */
+    const S_P_Htable = new Map<XTree | null, XTree[]>();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [, nodeList] of S_Htable) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const node of nodeList) {
+        const pNode = node.pPtr;
+        if (S_P_Htable.has(pNode)) {
+          S_P_Htable.get(pNode)!.push(node);
+        } else {
+          S_P_Htable.set(pNode, [node]);
+        }
+      }
+    }
+    // const T_P_Htable = new Map<string, XTree[]>();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [, nodeList] of T_Htable) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const newNode of nodeList) {
+        const expectPNode = newNode.pPtr?.nPtr;
+
+        if (expectPNode && S_P_Htable.has(expectPNode)) {
+          const oldChildren = S_P_Htable.get(expectPNode)!;
+          // eslint-disable-next-line no-restricted-syntax
+          for (const oldNode of oldChildren) {
+            if (newNode.index === oldNode.index) {
+              this.matchNodesWith(oldNode, newNode, EditOption.UPD);
+            } else if (newNode.label === oldNode.label) {
+              this.matchNodesWith(oldNode, newNode, EditOption.MOV);
+            }
+          }
+        }
+      }
+    }
+
+    // rest sub-tree marked as DEL or INS
+    XTreeBFTraverse(T_old, (node: XTree) => {
+      if (node.Op === null) {
+        node.Op = EditOption.DEL;
+      }
+    });
+    XTreeBFTraverse(T_new, (node: XTree) => {
+      if (node.Op === null) {
+        node.Op = EditOption.INS;
+      }
+    });
+
     const oldTree = this.dumpXTree(T_old);
     const newTree = this.dumpXTree(T_new);
-    return {
-      oldTree, newTree,
-    };
+
+    return { oldTree, newTree };
   }
 
   public abstract buildXTree(rawTree: T): XTree<S>;

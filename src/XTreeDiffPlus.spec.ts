@@ -36,6 +36,11 @@ describe('three nodes', () => {
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.UPD);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.UPD);
   });
 
   test('tree5 modify the second children node compared with tree4', () => {
@@ -46,6 +51,22 @@ describe('three nodes', () => {
     expect(oldTree.Op).toBe(EditOption.NOP);
     expect(oldTree?.getChild(0)?.Op).toBe(EditOption.NOP);
     expect(oldTree?.getChild(1)?.Op).toBe(EditOption.UPD);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree?.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(newTree?.getChild(1)?.Op).toBe(EditOption.UPD);
+  });
+
+  test('swap the order of children compared with tree2', () => {
+    const oldTree = createTree2();
+    const newTree = createTree3();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.MOV);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.MOV);
   });
 });
 
