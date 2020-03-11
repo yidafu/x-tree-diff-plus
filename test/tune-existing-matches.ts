@@ -9,7 +9,7 @@
  *                                                                           *
  * Copyright 2019 - 2020 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-import XTree, { NodeType } from '../src/XTree';
+import { XTree, NodeType } from '../src/XTree';
 
 export function createOldTree(): XTree {
   return new XTree({

@@ -11,7 +11,7 @@
  *-------------------------------------------------------------------------- */
 /* eslint-disable no-param-reassign */
 
-import EditOption from './EditOption';
+import { EditOption } from './EditOption';
 import md4 from './md4';
 import { typeOf, Memo } from './utils';
 
@@ -42,7 +42,7 @@ interface ITextParam<T> extends IBaseParam<T> {
 // FIXME: there T should keep the same with XTree<T>
 export type IXTreeConstructorParam<T = any> = INodeParam<T> | ITextParam<T>;
 
-export default class XTree<T = any> {
+export class XTree<T = any> {
   /** @type {string} */
   id?: string;
 

@@ -9,4 +9,6 @@
  *                                                                           *
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-export { default as XTreeDiff } from './XTreeDiffPlus';
+export { XTreeDiffPlus } from './XTreeDiffPlus';
+export { XTree, NodeType } from './XTree';
+export { EditOption } from './EditOption';

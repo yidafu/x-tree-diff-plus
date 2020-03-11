@@ -9,7 +9,7 @@
  *                                                                           *
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-enum EditOption {
+export enum EditOption {
   NOP,
   INS,
   DEL,
@@ -18,4 +18,3 @@ enum EditOption {
   CPY, // deprecate
 }
 
-export default EditOption;

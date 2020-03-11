@@ -17,10 +17,10 @@ import {
   // typeOf,
   XTreeDFPostOrderTraverse,
 } from './utils';
-import XTree from './XTree';
-import EditOption from './EditOption';
+import { XTree } from './XTree';
+import { EditOption } from './EditOption';
 
-export default abstract class XTreeDiffPlus<T = any, S= any> {
+export abstract class XTreeDiffPlus<T = any, S= any> {
   /** @types {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
   private N_Htable = new Map <string, XTree<S>>();
 

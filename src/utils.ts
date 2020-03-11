@@ -9,7 +9,7 @@
  *                                                                           *
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-import XTree from './XTree';
+import { XTree } from './XTree';
 
 export function typeOf(obj: any): string {
   return Object.prototype.toString.call(obj).slice(8, -1);
@@ -68,11 +68,14 @@ export function Memo(target: any, propertyKey: string, descriptor: PropertyDescr
     const sym = Symbol.for(propertyKey);
     const originalGetter = descriptor.get;
     descriptor.get = function propGetter(): ReturnType<typeof originalGetter> {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       if (typeOf(this[sym]) === 'Undefined') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         this[sym] = originalGetter.call(this);
       }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       return this[sym];
     };

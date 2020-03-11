@@ -10,14 +10,14 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 
-import XTreeDiffPlus from './XTreeDiffPlus';
-import EditOption from './EditOption';
+import { XTreeDiffPlus } from './XTreeDiffPlus';
+import { EditOption } from './EditOption';
 import { createTree1, createTree2, createTree3, createTree5, createTree4} from '../test/three-nodes';
 import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree1 from '../test/tree1';
 // import createTree2 from '../test/tree2';
 // import createTree3 from '../test/tree3';
-import XTree from './XTree';
+import { XTree } from './XTree';
 
 class DefaultXTreeDiff extends XTreeDiffPlus<XTree> {
   public buildXTree(tree: XTree) {

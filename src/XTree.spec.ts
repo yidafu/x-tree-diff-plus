@@ -9,7 +9,7 @@
  *                                                                           *
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
-import XTree, { NodeType } from './XTree';
+import { XTree, NodeType } from './XTree';
 
 describe('XTree', () => {
   test('one node', () => {
