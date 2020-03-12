@@ -268,7 +268,7 @@ export class XTree<T = any> {
    * @type {T}
    * @memberof XTree
    */
-  public data: T;
+  public data?: T;
 
   constructor(param: IXTreeConstructorParam) {
     this.index = param.index;
