@@ -24,8 +24,8 @@ class DefaultXTreeDiff extends XTreeDiffPlus<XTree> {
     return tree;
   }
   
-  public dumpXTree(xTree: XTree): XTree {
-    return xTree;
+  public dumpXTree(oldTree: XTree, newTree: XTree): { oldTree: XTree, newTree: XTree} {
+    return { oldTree, newTree };
   }
 }
 

@@ -338,15 +338,10 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
       }
     });
 
-    const oldTree = this.dumpXTree(T_old);
-    const newTree = this.dumpXTree(T_new);
-
-    return { oldTree, newTree };
+    return this.dumpXTree(T_old, T_new);
   }
 
   public abstract buildXTree(rawTree: T): XTree<S>;
 
-  public dumpXTree(xTree: XTree<S>): any {
-    return xTree;
-  }
+  public abstract dumpXTree(oldTree: XTree<S>, newTree: XTree<S>): { oldTree: any; newTree: any };
 }
