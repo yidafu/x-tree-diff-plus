@@ -19,7 +19,7 @@ import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree3 from '../test/tree3';
 import { XTree } from './XTree';
 
-class DefaultXTreeDiff extends XTreeDiffPlus<XTree> {
+class DefaultXTreeDiff extends XTreeDiffPlus<XTree, XTree> {
   public buildXTree(tree: XTree) {
     return tree;
   }

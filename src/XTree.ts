@@ -124,10 +124,10 @@ export class XTree<T = any> {
   /**
    * node pointer to anther XTree
    *
-   * @type {XTree}
+   * @type {XTree<T>}
    * @memberof XTree
    */
-  public nPtr: XTree | null = null;
+  public nPtr: XTree<T> | null = null;
 
   /**
    * edit option
@@ -216,9 +216,9 @@ export class XTree<T = any> {
     return positiveMatch / (positiveMatch + negativeMatch);
   }
 
- public alernativeMetches(): {supportingDegree: number; supportingDegreeNode: XTree | null } {
+ public alernativeMetches(): {supportingDegree: number; supportingDegreeNode: XTree<T> | null } {
    /** @type {XTree[]} the list of alernative metches */
-   const lAM: Map<XTree, number> = new Map();
+   const lAM: Map<XTree<T>, number> = new Map();
    this.forEach((node) => {
      // am ==> alernativeMetch
      const am = node?.nPtr?.pPtr;
@@ -251,15 +251,15 @@ export class XTree<T = any> {
    * @type {XTree[]}
    * @memberof XTree
    */
-  private children: XTree[] = [];
+  private children: XTree<T>[] = [];
 
   /**
    * pointer to parent XTree
    *
-   * @type {(XTree | null)}
+   * @type {XTree<T>}
    * @memberof XTree
    */
-  public pPtr: XTree | null = null;
+  public pPtr: XTree<T> | null = null;
 
   /**
    * extensible property.
@@ -286,8 +286,8 @@ export class XTree<T = any> {
     }
   }
 
-  public append(children: XTree | XTree[]): void {
-    const append = (child: XTree): void => {
+  public append(children: XTree<T> | XTree<T>[]): void {
+    const append = (child: XTree<T>): void => {
       if (child instanceof XTree) {
         child.pPtr = this;
         this.children.push(child);
@@ -302,7 +302,7 @@ export class XTree<T = any> {
     }
   }
 
-  public forEach(callback: (node: XTree, index: number, thisArg: XTree) => void): void {
+  public forEach(callback: (node: XTree<T>, index: number, thisArg: XTree<T>) => void): void {
     this.children.forEach((child) => {
       callback(child, child.index, this);
     });
@@ -312,7 +312,7 @@ export class XTree<T = any> {
     return this.children.length !== 0;
   }
 
-  public getChild(idx: number): XTree | null {
+  public getChild(idx: number): XTree<T> | null {
     if (typeof idx !== 'number') {
       throw TypeError('child index must be number');
     }

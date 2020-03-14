@@ -52,8 +52,8 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     const stack1 = [node1];
     const stack2 = [node2];
     while (stack1.length && stack2.length) {
-      const nodeA = stack1.pop() as XTree<S>;
-      const nodeB = stack2.pop() as XTree<S>;
+      const nodeA = stack1.pop()!;
+      const nodeB = stack2.pop()!;
       this.matchNodesWith(nodeA, nodeB, op);
       if (nodeA.hasChildren()) {
         nodeA.forEach(node => stack1.push(node));
@@ -71,20 +71,19 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
    * @param {Map<XTree, XTree>} matchMap
    * @memberof XTreeDiffPlus
    */
-  private matchUpward(matchMap: Map<XTree, XTree> | [XTree, XTree][]): void {
+  private matchUpward(matchMap: Map<XTree<S>, XTree<S>> | [XTree<S>, XTree<S>][]): void {
     // eslint-disable-next-line no-restricted-syntax
     for (const [nodeA, nodeB] of matchMap) {
-      let pA: XTree = nodeA.pPtr as XTree<S>;
-      let pB: XTree = nodeB.pPtr as XTree<S>;
+      let pA = nodeA.pPtr;
+      let pB = nodeB.pPtr;
       while (true) {
-        if (pA === null && pB === null) {
+        if (pA === null || pB === null) {
           break;
-        }
-        if (pA.nPtr === null && pB.nPtr === null) {
+        } else if (pA.nPtr === null && pB.nPtr === null) {
           if (pA.label === pB.label) {
             this.matchNodesWith(pA, pB, EditOption.NOP);
-            pA = pA.pPtr as XTree<S>;
-            pB = pB.pPtr as XTree<S>;
+            pA = pA.pPtr;
+            pB = pB.pPtr;
           } else {
             break;
           }
@@ -105,10 +104,9 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
    * @memberof XTreeDiffPlus
    */
   private initHtable(
-    root: XTree<S>, callback: (node: XTree<S>, tMD_map: Map < string, number >) => void,
+    root: XTree<S>, callback: (node: XTree<S>, tMD_map: Map <string, number>) => void,
   ): Map < string, number > {
-    const tMD_map = new Map < string,
-      number >();
+    const tMD_map = new Map <string, number>();
     XTreeDFTraverse<S>(root, (node: XTree<S>) => {
       if (tMD_map.has(node.tMD)) {
         tMD_map.set(node.tMD, (tMD_map.get(node.tMD) as number) + 1);
@@ -117,7 +115,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
       }
     });
 
-    XTreeDFTraverse<S>(root, (node: XTree) => callback(node, tMD_map));
+    XTreeDFTraverse<S>(root, (node: XTree<S>) => callback(node, tMD_map));
     return tMD_map;
   }
 
@@ -130,7 +128,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
       const isNonUnique = old_tMD_map.get(node.tMD) !== 1;
       if (isNonUnique) {
         if (this.O_Htable.has(node.tMD)) {
-          const nonUniqueArr = this.O_Htable.get(node.tMD) as XTree[];
+          const nonUniqueArr = this.O_Htable.get(node.tMD)!;
           nonUniqueArr.push(node);
         } else {
           this.O_Htable.set(node.tMD, [node]);
@@ -241,8 +239,8 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
 
     // step 5 metch remaining identical subtree with move and copy operations
     // find all unmatch nodes
-    const S_Htable: Map<string, XTree[]> = new Map();
-    XTreeBFTraverse(T_old, (node: XTree) => {
+    const S_Htable: Map<string, XTree<S>[]> = new Map();
+    XTreeBFTraverse(T_old, (node: XTree<S>) => {
       if (node.Op === null) {
         if (S_Htable.has(node.tMD)) {
           const T_LNp = S_Htable.get(node.tMD)!;
@@ -252,8 +250,8 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
         }
       }
     });
-    const T_Htable: Map<string, XTree[]> = new Map();
-    XTreeBFTraverse(T_new, (node: XTree) => {
+    const T_Htable: Map<string, XTree<S>[]> = new Map();
+    XTreeBFTraverse(T_new, (node: XTree<S>) => {
       if (node.Op === null) {
         if (T_Htable.has(node.tMD)) {
           const T_LNp = T_Htable.get(node.tMD)!;
@@ -292,7 +290,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
 
     // find out all sub-tree has equivalent parent and the same index, marked as UPD
     /** @types {Map<XTree | null, XTree[]>} key: parent nodes, value: unmatched children. */
-    const S_P_Htable = new Map<XTree | null, XTree[]>();
+    const S_P_Htable = new Map<XTree<S> | null, XTree<S>[]>();
     // eslint-disable-next-line no-restricted-syntax
     for (const [, nodeList] of S_Htable) {
       // eslint-disable-next-line no-restricted-syntax
@@ -327,12 +325,12 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     }
 
     // rest sub-tree marked as DEL or INS
-    XTreeBFTraverse(T_old, (node: XTree) => {
+    XTreeBFTraverse(T_old, (node: XTree<S>) => {
       if (node.Op === null) {
         node.Op = EditOption.DEL;
       }
     });
-    XTreeBFTraverse(T_new, (node: XTree) => {
+    XTreeBFTraverse(T_new, (node: XTree<S>) => {
       if (node.Op === null) {
         node.Op = EditOption.INS;
       }
