@@ -243,8 +243,8 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     XTreeBFTraverse(T_old, (node: XTree<S>) => {
       if (node.Op === null) {
         if (S_Htable.has(node.tMD)) {
-          const T_LNp = S_Htable.get(node.tMD)!;
-          T_LNp.push(node);
+          const S_LNp = S_Htable.get(node.tMD)!;
+          S_LNp.push(node);
         } else {
           S_Htable.set(node.tMD, [node]);
         }
@@ -282,8 +282,6 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
           T_LNp[idx].nPtr = S_LNp[idx];
           this.matchNodeSubtreeWith(S_LNp[idx], T_LNp[idx], EditOption.NOP);
           this.matchUpward([[S_LNp[idx], T_LNp[idx]]]);
-          S_LNp.splice(idx, 1);
-          T_LNp.splice(idx, 1);
         }
       }
     }
@@ -295,15 +293,17 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     for (const [, nodeList] of S_Htable) {
       // eslint-disable-next-line no-restricted-syntax
       for (const node of nodeList) {
-        const pNode = node.pPtr;
-        if (S_P_Htable.has(pNode)) {
-          S_P_Htable.get(pNode)!.push(node);
-        } else {
-          S_P_Htable.set(pNode, [node]);
+        if (node.Op === null) {
+          const pNode = node.pPtr;
+          if (S_P_Htable.has(pNode)) {
+            S_P_Htable.get(pNode)!.push(node);
+          } else {
+            S_P_Htable.set(pNode, [node]);
+          }
         }
       }
     }
-    // const T_P_Htable = new Map<string, XTree[]>();
+
     // eslint-disable-next-line no-restricted-syntax
     for (const [, nodeList] of T_Htable) {
       // eslint-disable-next-line no-restricted-syntax
