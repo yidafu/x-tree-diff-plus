@@ -167,3 +167,72 @@ export function createTree5(): XTree<string> {
     ],
   });
 }
+
+
+/**
+ * without Id
+ * has a extra child node
+ *
+ * @export
+ * @returns {XTree<string>}
+ */
+export function createTree6(): XTree<string> {
+  return new XTree<string>({
+    label: 'a',
+    type: NodeType.ELEMENT,
+    index: 1,
+    data: 'tree4-level-1-a-1',
+    children: [
+      new XTree<string>({
+        label: 'b',
+        type: NodeType.ELEMENT,
+        index: 1,
+        data: 'tree4-level-2-b-1',
+      }),
+      new XTree<string>({
+        label: 'c',
+        type: NodeType.ELEMENT,
+        index: 2,
+        data: 'tree4-level-2-b-2',
+      }),
+      new XTree<string>({
+        label: 'd',
+        type: NodeType.ELEMENT,
+        index: 3,
+        data: 'tree4-level-2-b-2',
+      }),
+    ],
+  });
+}
+
+
+/**
+ * without Id
+ * missing a child node
+ *
+ * @export
+ * @returns {XTree<string>}
+ */
+export function createTree7(): XTree<string> {
+  return new XTree<string>({
+    label: 'a',
+    type: NodeType.ELEMENT,
+    index: 1,
+    data: 'tree4-level-1-a-1',
+    children: [
+      new XTree<string>({
+        label: 'b',
+        type: NodeType.ELEMENT,
+        index: 1,
+        data: 'tree4-level-2-b-1',
+      }),
+      new XTree<string>({
+        label: 'd',
+        type: NodeType.ELEMENT,
+        index: 3,
+        data: 'tree4-level-2-b-2',
+      }),
+    ],
+  });
+}
+

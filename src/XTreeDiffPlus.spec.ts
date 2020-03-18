@@ -12,7 +12,7 @@
 
 import { XTreeDiffPlus } from './XTreeDiffPlus';
 import { EditOption } from './EditOption';
-import { createTree1, createTree2, createTree3, createTree5, createTree4} from '../test/three-nodes';
+import { createTree1, createTree2, createTree3, createTree5, createTree4, createTree6, createTree7} from '../test/three-nodes';
 import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree1 from '../test/tree1';
 // import createTree2 from '../test/tree2';
@@ -67,6 +67,33 @@ describe('three nodes', () => {
     expect(newTree.Op).toBe(EditOption.NOP);
     expect(newTree.getChild(0)?.Op).toBe(EditOption.MOV);
     expect(newTree.getChild(1)?.Op).toBe(EditOption.MOV);
+  });
+
+  test('tree 6 has a extra child node compared with tree5', () => {
+    const oldTree = createTree5();
+    const newTree = createTree6();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.NOP);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(2)?.Op).toBe(EditOption.INS);
+  });
+
+  test('tree 7 missing the second child node compared with tree6', () => {
+    const oldTree = createTree6();
+    const newTree = createTree7();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.DEL);
+    expect(oldTree.getChild(2)?.Op).toBe(EditOption.NOP);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.NOP);
   });
 });
 
