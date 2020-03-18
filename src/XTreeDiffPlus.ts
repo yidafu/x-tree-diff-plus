@@ -308,16 +308,18 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     for (const [, nodeList] of T_Htable) {
       // eslint-disable-next-line no-restricted-syntax
       for (const newNode of nodeList) {
-        const expectPNode = newNode.pPtr?.nPtr;
+        if (newNode.Op === null) {
+          const expectPNode = newNode.pPtr?.nPtr;
 
-        if (expectPNode && S_P_Htable.has(expectPNode)) {
-          const oldChildren = S_P_Htable.get(expectPNode)!;
-          // eslint-disable-next-line no-restricted-syntax
-          for (const oldNode of oldChildren) {
-            if (newNode.index === oldNode.index) {
-              this.matchNodesWith(oldNode, newNode, EditOption.UPD);
-            } else if (newNode.label === oldNode.label) {
-              this.matchNodesWith(oldNode, newNode, EditOption.MOV);
+          if (expectPNode && S_P_Htable.has(expectPNode)) {
+            const oldChildren = S_P_Htable.get(expectPNode)!;
+            // eslint-disable-next-line no-restricted-syntax
+            for (const oldNode of oldChildren) {
+              if (newNode.index === oldNode.index) {
+                this.matchNodesWith(oldNode, newNode, EditOption.UPD);
+              } else if (newNode.label === oldNode.label) {
+                this.matchNodesWith(oldNode, newNode, EditOption.MOV);
+              }
             }
           }
         }
