@@ -18,6 +18,7 @@ import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree2 from '../test/tree2';
 // import createTree3 from '../test/tree3';
 import { XTree } from './XTree';
+import { createTree11, createTree12 } from '../test/duplicate';
 
 class DefaultXTreeDiff extends XTreeDiffPlus<XTree, XTree> {
   public buildXTree(tree: XTree) {
@@ -111,26 +112,32 @@ describe('standard case', () => {
   });
 });
 
-// describe('xTreeDiff', () => {
-//   test('node delete/insert/update', () => {
-//     const T_old = createTree1();
-//     const T_new = createTree2();
-//     const xTreeDiff = new DefaultXTreeDiff(T_old, T_new);
-//     xTreeDiff.diff();
-//     console.log(T_old)
-//     expect(T_old.nPtr).toBe(T_new);
-//       expect(T_old.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.DEL);
-//       expect(T_new.getChild(0)?.getChild(1)?.getChild(1)?.Op).toBe(EditOption.INS);
-//       expect(T_new.getChild(0)?.getChild(1)?.getChild(0)?.Op).toBe(EditOption.UPD);
-//   });
 
-//   test('node moved', () => {
-//     const T_old = createTree1();
-//     const T_new = createTree3();
-//     const xTreeDiff = new DefaultXTreeDiff(T_old, T_new);
-//     xTreeDiff.diff();
-//     expect(T_old.nPtr).toBe(T_new);
-//     expect(T_old.getChild(0)?.getChild(1)?.Op).toBe(EditOption.MOV);
-//     expect(T_new.getChild(1)?.getChild(0)?.Op).toBe(EditOption.MOV);
-//   });
-// });
+describe('duplicate node', () => {
+  test('twe tree are the same', () => {
+    const oldTree = createTree11();
+    const newTree = createTree11();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(newTree.Op).toBe(EditOption.NOP);
+
+    expect(newTree.getChild(0)!.getChild(0)!.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)!.getChild(1)!.Op).toBe(EditOption.NOP);
+  });
+
+  test('the second child of these trees are not the same', () => {
+    const oldTree = createTree11();
+    const newTree = createTree12();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(newTree.Op).toBe(EditOption.NOP);
+
+    expect(newTree.getChild(0)!.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)!.Op).toBe(EditOption.UPD);
+  });
+
+});
