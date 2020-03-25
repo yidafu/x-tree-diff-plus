@@ -21,13 +21,13 @@ import { XTree } from './XTree';
 import { EditOption } from './EditOption';
 
 export abstract class XTreeDiffPlus<T = any, S= any> {
-  /** @types {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
+  /** @type {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
   private N_Htable = new Map <string, XTree<S>>();
 
-  /** @types {Map<string, XTree<S>[]>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
+  /** @type {Map<string, XTree<S>[]>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
   private O_Htable = new Map <string, XTree<S>[]>();
 
-  /** @types {Map<XTree<S>, XTree<S>>} [oldTreeNode, newTreeNode] */
+  /** @type {Map<XTree<S>, XTree<S>>} [oldTreeNode, newTreeNode] */
   private M_List = new Map<XTree<S>, XTree<S>>();
 
   /** @type {Map<string, XTree<S>>} iMd as key, X-tree Node as value  */
