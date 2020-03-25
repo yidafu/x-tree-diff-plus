@@ -269,6 +269,13 @@
   dependencies:
     find-up "^4.0.0"
 
+"@dovyih/x-tree-diff-plus@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@dovyih/x-tree-diff-plus/-/x-tree-diff-plus-0.1.0.tgz#a56e612a5724b8d43b14eebf53d2171e7d3a129d"
+  integrity sha512-0ugkBoN76GtY23HBDlgNf3EzPZXlATObwtRz/IZRz1s461d/Jrm0M2o7tVdK5gQzsdcV3LXRaZFwVeKyDS2m+Q==
+  dependencies:
+    md5 "^2.2.1"
+
 "@jest/console@^24.7.1", "@jest/console@^24.9.0":
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/@jest/console/-/console-24.9.0.tgz#79b1bc06fb74a8cfb01cbdedf945584b1b9707f0"

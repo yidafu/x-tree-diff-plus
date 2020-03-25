@@ -70,6 +70,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
+    "@dovyih/x-tree-diff-plus": "0.1.0",
     "md5": "^2.2.1"
   },
   "directories": {
