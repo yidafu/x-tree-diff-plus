@@ -44,7 +44,6 @@ describe('Memo Decrator', () => {
       i = 0;
       @Memo
       get prop() {
-        console.log(this)
         return ++this.i;
       }
     }

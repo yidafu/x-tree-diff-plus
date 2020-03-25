@@ -12,7 +12,7 @@
 
 import { XTreeDiffPlus } from './XTreeDiffPlus';
 import { EditOption } from './EditOption';
-import { createTree1, createTree2, createTree3, createTree5, createTree4, createTree6, createTree7} from '../test/three-nodes';
+import { createTree01, createTree02, createTree03, createTree05, createTree04, createTree06, createTree07, createTree08, createTree09, createTree010, createTree011} from '../test/three-nodes';
 import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree1 from '../test/tree1';
 // import createTree2 from '../test/tree2';
@@ -32,8 +32,8 @@ class DefaultXTreeDiff extends XTreeDiffPlus<XTree, XTree> {
 
 describe('three nodes', () => {
   test('modify the second children node compared with tree1', () => {
-    const oldTree = createTree1();
-    const newTree = createTree2();
+    const oldTree = createTree01();
+    const newTree = createTree02();
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
@@ -45,8 +45,8 @@ describe('three nodes', () => {
   });
 
   test('tree5 modify the second children node compared with tree4', () => {
-    const oldTree = createTree4();
-    const newTree = createTree5();
+    const oldTree = createTree04();
+    const newTree = createTree05();
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
@@ -58,8 +58,8 @@ describe('three nodes', () => {
   });
 
   test('swap the order of children compared with tree2', () => {
-    const oldTree = createTree2();
-    const newTree = createTree3();
+    const oldTree = createTree02();
+    const newTree = createTree03();
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
@@ -71,8 +71,8 @@ describe('three nodes', () => {
   });
 
   test('tree 6 has a extra child node compared with tree5', () => {
-    const oldTree = createTree5();
-    const newTree = createTree6();
+    const oldTree = createTree05();
+    const newTree = createTree06();
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
@@ -84,17 +84,71 @@ describe('three nodes', () => {
   });
 
   test('tree 7 missing the second child node compared with tree6', () => {
-    const oldTree = createTree6();
-    const newTree = createTree7();
+    const oldTree = createTree06();
+    const newTree = createTree07();
     const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
     xTreeDiff.diff();
     expect(oldTree.Op).toBe(EditOption.NOP);
     expect(oldTree.getChild(0)?.Op).toBe(EditOption.NOP);
     expect(oldTree.getChild(1)?.Op).toBe(EditOption.DEL);
-    expect(oldTree.getChild(2)?.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(2)?.Op).toBe(EditOption.MOV);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.MOV);
+  });
+
+  test('tree 8 has completely different children compared with tree7', () => {
+    const oldTree = createTree07();
+    const newTree = createTree08();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.DEL);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.DEL);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.DEL);
+    expect(newTree.Op).toBe(EditOption.INS);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.INS);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.INS);
+  });
+  
+  test('tree 9 this first child different from tree7', () => {
+    const oldTree = createTree07();
+    const newTree = createTree09();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.MOV);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.MOV);
+    expect(newTree.getChild(0)?.getChild(0)?.Op).toBe(EditOption.INS);
+  });
+
+  test('tree 10 children not eqaul to tree 5', () => {
+    const oldTree = createTree05();
+    const newTree = createTree010();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.NOP);
     expect(newTree.Op).toBe(EditOption.NOP);
     expect(newTree.getChild(0)?.Op).toBe(EditOption.NOP);
     expect(newTree.getChild(1)?.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.getChild(0)?.Op).toBe(EditOption.INS);
+  });
+
+  test('tree 11 break order with id compared to tree 2', () => {
+    const oldTree = createTree02();
+    const newTree = createTree011();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(oldTree.getChild(1)?.Op).toBe(EditOption.MOV);
+    expect(newTree.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(0)?.Op).toBe(EditOption.MOV);
+    expect(newTree.getChild(1)?.Op).toBe(EditOption.MOV);
   });
 });
 
