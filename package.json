@@ -30,6 +30,7 @@
     "test": "jest",
     "ts": "ts-node",
     "prepublishOnly": "yarn build",
+    "doc": "typedoc",
     "build": "rm -fr dsit && tsc --build tsconfig.json"
   },
   "lint-staged": {
@@ -67,6 +68,8 @@
     "lint-staged": "^9.5.0",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.4",
+    "typedoc": "^0.17.4",
+    "typedoc-plugin-markdown": "^2.2.17",
     "typescript": "^3.7.4"
   },
   "dependencies": {
