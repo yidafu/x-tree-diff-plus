@@ -1,3 +1,7 @@
+[XTree Diff+](README.md) › [Globals](globals.md)
+
+# XTree Diff+
+
 # x-tree-diff-plus
 
 <center>
@@ -80,7 +84,6 @@ const tree1 = new XTree<string>({
       }),
     ],
   });
-
 
 // <A>
 //   <B></B>

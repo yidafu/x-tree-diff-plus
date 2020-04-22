@@ -29,16 +29,24 @@ import { EditOption } from './EditOption';
  * @template S XTree data proprety type
  */
 export abstract class XTreeDiffPlus<T = any, S= any> {
-  /** @type {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
+  /**
+   * @type {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable
+   */
   private N_Htable = new Map <string, XTree<S>>();
 
-  /** @type {Map<string, XTree<S>[]>}  all the nodes with non-unique tMD in T_old are registered to O_Htable  */
+  /**
+   * @type {Map<string, XTree<S>[]>}  all the nodes with non-unique tMD in T_old are registered to O_Htable
+   */
   private O_Htable = new Map <string, XTree<S>[]>();
 
-  /** @type {Map<XTree<S>, XTree<S>>} [oldTreeNode, newTreeNode] */
+  /**
+   * @type {Map<XTree<S>, XTree<S>>} [oldTreeNode, newTreeNode]
+   */
   private M_List = new Map<XTree<S>, XTree<S>>();
 
-  /** @type {Map<string, XTree<S>>} iMd as key, X-tree Node as value  */
+  /**
+   * @type {Map<string, XTree<S>>} iMd as key, X-tree Node as value
+   */
   private N_IDHtable = new Map<string, XTree<S>>();
 
   protected rawOld: T;
@@ -127,6 +135,12 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     return tMD_map;
   }
 
+  /**
+   * run diff algorithm
+   *
+   * @returns {{ oldTree: S; newTree: S }}
+   * @memberof XTreeDiffPlus
+   */
   diff(): { oldTree: S; newTree: S } {
     const { rawOld, rawMew } = this;
     const T_old = this.buildXTree(rawOld);
@@ -353,7 +367,24 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
     return this.dumpXTree(T_old, T_new);
   }
 
+  /**
+   * buid XFree from source Tree type
+   *
+   * @abstract
+   * @param {T} rawTree
+   * @returns {XTree<S>}
+   * @memberof XTreeDiffPlus
+   */
   public abstract buildXTree(rawTree: T): XTree<S>;
 
+  /**
+   * dump XTree to target tree type
+   *
+   * @abstract
+   * @param {XTree<S>} oldTree
+   * @param {XTree<S>} newTree
+   * @returns {{ oldTree: any; newTree: any }}
+   * @memberof XTreeDiffPlus
+   */
   public abstract dumpXTree(oldTree: XTree<S>, newTree: XTree<S>): { oldTree: any; newTree: any };
 }
