@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------------------*
- * Description:                                                              *
+ * Description: X-Tree Diff+ plus implement.                                 *
  *                                                                           *
  * File Created: Thursday, 26th December 2019 1:18 pm                        *
  * Author: yidafu(dov-yih) (me@yidafu.dev)                                   *
@@ -10,16 +10,24 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 /* eslint-disable class-methods-use-this */
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import {
   XTreeDFTraverse,
   XTreeBFTraverse,
   // typeOf,
   XTreeDFPostOrderTraverse,
 } from './utils';
-import { XTree } from './XTree';
+import { XTree, NodeType } from './XTree';
 import { EditOption } from './EditOption';
 
+/**
+ * X-Tree Diff+ plus implement.
+ *
+ * @export
+ * @abstract
+ * @class XTreeDiffPlus
+ * @template T old & new tree type
+ * @template S XTree data proprety type
+ */
 export abstract class XTreeDiffPlus<T = any, S= any> {
   /** @type {Map<string, XTree<S>>}  all the nodes with unique tMD in T_new are registered to N_Htable  */
   private N_Htable = new Map <string, XTree<S>>();
@@ -215,11 +223,15 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
             // sub-tree is eaual, so mark sub-tree as NOP
             this.matchNodeSubtreeWith(cA[aIdx], cB[bIdx], EditOption.NOP);
           } else {
-            const alLabelIdx = cA.findIndex(childA => childA.lLabel === cB[bIdx].lLabel);
-            if (alLabelIdx !== -1) {
-              // The only certainty that node is equal
-              this.matchNodesWith(cA[alLabelIdx], cB[bIdx], EditOption.NOP);
-            }
+            // https://github.com/yidafu/x-tree-diff-plus/issues/3
+            cA.forEach((childA) => {
+              if ((childA.type === NodeType.TEXT) && (childA.type === cB[bIdx].type)) {
+                // text node value alway not equal
+                this.matchNodesWith(childA, cB[bIdx], EditOption.UPD);
+              } else if (childA.lLabel === cB[bIdx].lLabel) {
+                this.matchNodesWith(childA, cB[bIdx], EditOption.NOP);
+              }
+            });
           }
         }
       }

@@ -19,6 +19,7 @@ import { createOldTree, createNewTree } from '../test/tune-existing-matches'
 // import createTree3 from '../test/tree3';
 import { XTree } from './XTree';
 import { createTree11, createTree12 } from '../test/duplicate';
+import { createTree22, createTree21, createTree23 } from '../test/text-ndoe';
 
 class DefaultXTreeDiff extends XTreeDiffPlus<XTree, XTree> {
   public buildXTree(tree: XTree) {
@@ -194,4 +195,23 @@ describe('duplicate node', () => {
     expect(newTree.getChild(1)!.Op).toBe(EditOption.UPD);
   });
 
+  describe('text node', () => {
+    test('the secode text are diffirent', () => {
+      const oldTree = createTree21();
+      const newTree = createTree22();
+      const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+      xTreeDiff.diff();
+      expect(newTree.getChild(1)!.getChild(0)!.Op).toBe(EditOption.UPD);
+      expect(oldTree.getChild(1)!.getChild(0)!.Op).toBe(EditOption.UPD);
+    });
+
+    test('oldTree two text node are the same,but newTree not', () => {
+      const oldTree = createTree23();
+      const newTree = createTree21();
+      const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+      xTreeDiff.diff();
+      expect(newTree.getChild(1)!.getChild(0)!.Op).toBe(EditOption.UPD);
+      expect(oldTree.getChild(1)!.getChild(0)!.Op).toBe(EditOption.UPD);
+    });
+  });
 });
