@@ -10,7 +10,7 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 
-import { createTree31 , createTree32 } from '../test/nested'
+import { createTree31 , createTree32, createTree33 } from '../test/nested'
 import { XTreeDiffPlus }                                                                                                                                             from './XTreeDiffPlus';
 import { EditOption }                                                                                                                                                from './EditOption';
 import { createTree01, createTree02, createTree03, createTree05, createTree04, createTree06, createTree07, createTree08, createTree09, createTree010, createTree011} from '../test/three-nodes';
@@ -321,5 +321,83 @@ describe (
                          ?.getChild ( 4 ) )
       }
     )
+
+    test (
+      'inserting a element node in between of some text nodes and modify the first text node' ,
+      () => {
+        // old Tree:  <div>This is a good test.</div>
+        const oldTree = createTree31 ()
+
+        // new Tree:  <div>These is a<b>very good</b>test.</div>
+        const newTree = createTree33 ()
+
+        const xTreeDiff = new DefaultXTreeDiff (
+          oldTree ,
+          newTree
+        )
+
+
+        xTreeDiff.diff ()
+
+        expect ( oldTree.Op )
+          .toBe ( EditOption.NOP )
+        expect ( newTree.Op )
+          .toBe ( EditOption.NOP )
+
+        // This 
+        const This = newTree?.getChild ( 0 )
+                            ?.getChild ( 0 )
+        expect ( This?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 0 ) )
+
+        // is 
+        const is = newTree?.getChild ( 0 )
+                          ?.getChild ( 1 )
+        expect ( is?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 1 ) )
+
+        // a 
+        const a = newTree?.getChild ( 0 )
+                         ?.getChild ( 2 )
+        expect ( a?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 2 ) )
+
+        expect ( newTree?.getChild ( 0 )
+                        ?.getChild ( 3 ) )
+          .toBeNull ()
+
+
+        // <b>very good</b> 
+        const B = newTree?.getChild ( 1 )
+        expect ( B?.label )
+          .toBe ( 'B' )
+
+        expect ( B?.getChild ( 0 )?.value )
+          .toBe ( 'very' )
+        expect ( B?.getChild ( 0 )?.Op )
+          .toBe ( EditOption.INS )
+
+        expect ( B?.getChild ( 1 )?.value )
+          .toBe ( 'good' )
+        expect ( B?.getChild ( 1 )?.Op )
+          .toBe ( EditOption.MOV )
+
+        expect ( B?.getChild ( 1 )?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 3 ) )
+
+        // test. 
+        const test = newTree?.getChild ( 2 )
+                            ?.getChild ( 0 )
+        expect ( test?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 4 ) )
+      }
+    )
+
+
   }
 )
