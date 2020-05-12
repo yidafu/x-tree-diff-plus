@@ -239,6 +239,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
           } else {
             // https://github.com/yidafu/x-tree-diff-plus/issues/3
             cA.forEach((childA) => {
+              if (bIdx >= cB.length) { return; }
               if ((childA.type === NodeType.TEXT) && (childA.type === cB[bIdx].type)) {
                 // text node value alway not equal
                 this.matchNodesWith(childA, cB[bIdx], EditOption.UPD);
