@@ -275,7 +275,7 @@ export function createTree34(): XTree<string> {
 }
 
 export function createTree35(): XTree<string> {
-  // old Tree:  <div>These are some<b>very good</b>tests.</div>
+  // old Tree:  <div>These are a<b>very good</b>tests.</div>
 
   return new XTree<string>({
     label: 'DIV',
@@ -301,6 +301,81 @@ export function createTree35(): XTree<string> {
             type: NodeType.TEXT,
             index: 2,
             value: 'a',
+          }),
+        ],
+      }),
+      new XTree<string>(
+        {
+          label: 'B',
+          type: NodeType.ELEMENT,
+          index: 1,
+          children: [
+            new XTree<string>(
+              {
+                type: NodeType.TEXT,
+                value: 'very',
+                index: 0,
+              },
+            ),
+            new XTree<string>(
+              {
+                type: NodeType.TEXT,
+                value: 'good',
+                index: 1,
+              },
+            ),
+          ],
+        },
+      ),
+
+      new XTree<string>(
+        {
+          label: '#TEXT-ROOT',
+          type: NodeType.ELEMENT,
+          index: 2,
+          children: [
+            new XTree<string>(
+              {
+                type: NodeType.TEXT,
+                value: 'tests.',
+                index: 1,
+              },
+            ),
+          ],
+        }),
+
+    ],
+
+  });
+}
+
+export function createTree36(): XTree<string> {
+  // old Tree:  <div>These are some<b>very good</b>tests.</div>
+
+  return new XTree<string>({
+    label: 'DIV',
+    type: NodeType.ELEMENT,
+    index: 0,
+    children: [
+      new XTree<string>({
+        label: '#TEXT-ROOT',
+        type: NodeType.ELEMENT,
+        index: 0,
+        children: [
+          new XTree({
+            type: NodeType.TEXT,
+            index: 0,
+            value: 'These',
+          }),
+          new XTree({
+            type: NodeType.TEXT,
+            index: 1,
+            value: 'are',
+          }),
+          new XTree({
+            type: NodeType.TEXT,
+            index: 2,
+            value: 'some',
           }),
         ],
       }),
