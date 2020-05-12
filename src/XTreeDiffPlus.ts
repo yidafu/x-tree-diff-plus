@@ -242,8 +242,10 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
               if ((childA.type === NodeType.TEXT) && (childA.type === cB[bIdx].type)) {
                 // text node value alway not equal
                 this.matchNodesWith(childA, cB[bIdx], EditOption.UPD);
+                bIdx++;
               } else if (childA.lLabel === cB[bIdx].lLabel) {
                 this.matchNodesWith(childA, cB[bIdx], EditOption.NOP);
+                bIdx++;
               }
             });
           }
