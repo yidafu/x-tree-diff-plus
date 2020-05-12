@@ -260,6 +260,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
         const { supportingDegree, supportingDegreeNode } = node.alernativeMetches();
         if (supportingDegreeNode
             && supportingDegree > node.positiveMatch + supportingDegreeNode.positiveMatch) {
+          if (!(node.nPtr && supportingDegreeNode.nPtr)) { return; }
           this.matchNodesWith(node.nPtr!, supportingDegreeNode.nPtr!, EditOption.NOP);
           this.matchNodesWith(node, supportingDegreeNode, EditOption.NOP);
         }
