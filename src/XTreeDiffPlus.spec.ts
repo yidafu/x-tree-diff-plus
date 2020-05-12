@@ -10,7 +10,7 @@
  * Copyright 2019 - 2019 Mozilla Public License 2.0                          *
  *-------------------------------------------------------------------------- */
 
-import { createTree31 , createTree32, createTree33, createTree34, createTree35 } from '../test/nested'
+import { createTree31 , createTree32, createTree33, createTree34, createTree35 , createTree36 } from '../test/nested'
 import { XTreeDiffPlus }                                                                                                                                             from './XTreeDiffPlus';
 import { EditOption }                                                                                                                                                from './EditOption';
 import { createTree01, createTree02, createTree03, createTree05, createTree04, createTree06, createTree07, createTree08, createTree09, createTree010, createTree011} from '../test/three-nodes';
@@ -568,4 +568,76 @@ describe (
           .toBe ( EditOption.INS )
       }
     )
+
+
+    test (
+      'modify the entire sentence, except for the word in the new inserted element node' ,
+      () => {
+        // old Tree:  <div>This is a good test.</div>
+        const oldTree = createTree31 ()
+
+        // new Tree:  <div>These are some<b>very good</b>test.</div>
+        const newTree = createTree36 ()
+
+        const xTreeDiff = new DefaultXTreeDiff (
+          oldTree ,
+          newTree
+        )
+
+
+        xTreeDiff.diff ()
+
+
+        expect ( oldTree.Op )
+          .toBe ( EditOption.DEL )
+        expect ( newTree.Op )
+          .toBe ( EditOption.INS )
+
+        // These 
+        const These = newTree?.getChild ( 0 )
+                            ?.getChild ( 0 )
+        expect ( These?.Op )
+          .toBe ( EditOption.INS )
+
+        // are 
+        const are = newTree?.getChild ( 0 )
+                           ?.getChild ( 1 )
+        expect ( are?.Op )
+          .toBe ( EditOption.INS )
+
+        // some 
+        const some = newTree?.getChild ( 0 )
+                         ?.getChild ( 2 )
+        
+        expect ( some?.Op )
+          .toBe ( EditOption.INS )
+
+
+        // <b>very good</b> 
+        const B = newTree?.getChild ( 1 )
+        expect ( B?.label )
+          .toBe ( 'B' )
+
+        expect ( B?.getChild ( 0 )?.value )
+          .toBe ( 'very' )
+        expect ( B?.getChild ( 0 )?.Op )
+          .toBe ( EditOption.INS )
+
+        expect ( B?.getChild ( 1 )?.value )
+          .toBe ( 'good' )
+        expect ( B?.getChild ( 1 )?.Op )
+          .toBe ( EditOption.MOV )
+
+        expect ( B?.getChild ( 1 )?.nPtr )
+          .toBe ( oldTree?.getChild ( 0 )
+                         ?.getChild ( 3 ) )
+
+        // tests. 
+        const tests = newTree?.getChild ( 2 )
+                            ?.getChild ( 0 )
+        expect ( tests?.Op )
+          .toBe ( EditOption.INS )
+      }
+    )
+
   } );
