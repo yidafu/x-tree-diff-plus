@@ -100,3 +100,29 @@ export function createTree12(): XTree {
     ],
   });
 }
+
+
+export function createTree13(): XTree {
+  return new XTree({
+    label: 'a',
+    type: NodeType.ELEMENT,
+    index: 1,
+    children: [
+      new XTree({
+        label: 'b',
+        type: NodeType.ELEMENT,
+        index: 1,
+      }),
+      new XTree({
+        label: 'b',
+        type: NodeType.ELEMENT,
+        index: 2,
+      }),
+      new XTree({
+        label: 'b',
+        type: NodeType.ELEMENT,
+        index: 2,
+      }),
+    ],
+  });
+}

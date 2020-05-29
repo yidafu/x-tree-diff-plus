@@ -1,6 +1,6 @@
 {
   "name": "@dovyih/x-tree-diff-plus",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "A implementation for *X-tree Diff +: An Efficient Change Detection Algorithm for Tree-structured Data*",
   "private": false,
   "main": "dist/index.js",
@@ -29,8 +29,7 @@
     "lint": "eslint --ext .ts --fix src/",
     "test": "jest",
     "ts": "ts-node",
-    "prepublishOnly": "yarn build",
-    "doc": "typedoc",
+    "prepublishOnly": "yarn test && yarn build",
     "build": "rm -fr dsit && tsc --build tsconfig.json"
   },
   "lint-staged": {
