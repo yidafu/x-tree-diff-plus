@@ -232,7 +232,7 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
         });
 
         for (let bIdx = 0; bIdx < cB.length; bIdx++) {
-          const aIdx = cA.findIndex(chidA => chidA.tMD === cB[bIdx].tMD);
+          const aIdx = cA.findIndex(chidA => chidA.Op === null && chidA.tMD === cB[bIdx].tMD);
           if (aIdx !== -1) {
             // sub-tree is eaual, so mark sub-tree as NOP
             this.matchNodeSubtreeWith(cA[aIdx], cB[bIdx], EditOption.NOP);
