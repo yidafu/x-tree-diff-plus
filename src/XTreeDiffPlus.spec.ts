@@ -183,6 +183,29 @@ describe('duplicate node', () => {
     expect(newTree.getChild(1)!.getChild(1)!.Op).toBe(EditOption.NOP);
   });
 
+  test('all three child are the same', () => {
+    const oldTree = createTree13();
+    const newTree = createTree13();
+    const xTreeDiff = new DefaultXTreeDiff(oldTree, newTree);
+    xTreeDiff.diff();
+
+    expect(oldTree.Op).toBe(EditOption.NOP);
+    expect(newTree.Op).toBe(EditOption.NOP);
+
+
+    expect(newTree.getChild(0)!.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(1)!.Op).toBe(EditOption.NOP);
+    expect(newTree.getChild(2)!.Op).toBe(EditOption.NOP);
+    
+    expect(oldTree.getChild(0)!.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(1)!.Op).toBe(EditOption.NOP);
+    expect(oldTree.getChild(2)!.Op).toBe(EditOption.NOP);
+
+    expect(newTree.getChild(0)!.nPtr).toBe(oldTree.getChild(0));
+    expect(newTree.getChild(1)!.nPtr).toBe(oldTree.getChild(1));
+    expect(newTree.getChild(2)!.nPtr).toBe(oldTree.getChild(2));
+  });
+
   test('the second child of these trees are not the same', () => {
     const oldTree = createTree11()
     const newTree = createTree12()
