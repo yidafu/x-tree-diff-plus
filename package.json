@@ -49,8 +49,8 @@
     }
   },
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^11.0.0",
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "@types/jest": "^24.0.25",
     "@types/md5": "^2.1.33",
     "@types/xml2js": "^0.4.5",
