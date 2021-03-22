@@ -138,10 +138,10 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
   /**
    * run diff algorithm
    *
-   * @returns {{ oldTree: S; newTree: S }}
+   * @returns {{ oldTree: XTree<S>; newTree: XTree<S> }}
    * @memberof XTreeDiffPlus
    */
-  diff(): { oldTree: S; newTree: S } {
+  diff(): ReturnType<XTreeDiffPlus<T, S>['dumpXTree']> {
     const { rawOld, rawMew } = this;
     const T_old = this.buildXTree(rawOld);
     const T_new = this.buildXTree(rawMew);
@@ -390,5 +390,5 @@ export abstract class XTreeDiffPlus<T = any, S= any> {
    * @returns {{ oldTree: any; newTree: any }}
    * @memberof XTreeDiffPlus
    */
-  public abstract dumpXTree(oldTree: XTree<S>, newTree: XTree<S>): { oldTree: any; newTree: any };
+  public abstract dumpXTree(oldTree: XTree<S>, newTree: XTree<S>): { oldTree: XTree<S>; newTree: XTree<S> };
 }
